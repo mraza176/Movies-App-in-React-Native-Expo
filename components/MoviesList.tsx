@@ -3,7 +3,13 @@ import { router } from "expo-router";
 
 const MoviesList = ({ title, movies }: { title: string; movies: [] }) => {
   return (
-    <View style={{ marginTop: 30 }}>
+    <View
+      style={{
+        marginTop: 30,
+        marginBottom:
+          title.includes("Science") || title.includes("Similar") ? 30 : 0,
+      }}
+    >
       <Text
         style={{
           color: "white",

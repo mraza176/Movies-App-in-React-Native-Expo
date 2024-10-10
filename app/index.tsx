@@ -6,25 +6,29 @@ import {
   Image,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { getHorrorMovies, getLatestMovies } from "@/api";
+import { getHorrorMovies, getLatestMovies, getSciFiMovies } from "@/api";
 import { StatusBar } from "expo-status-bar";
 import MoviesList from "@/components/MoviesList";
+import { router } from "expo-router";
 
 const Home = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState<{
     latestMovies: [];
     horrorMovies: [];
-  }>({ latestMovies: [], horrorMovies: [] });
+    scifiMovies: [];
+  }>({ latestMovies: [], horrorMovies: [], scifiMovies: [] });
 
   const fetchData = async () => {
-    setIsLoading(true);
     setMovies({
       latestMovies: await getLatestMovies(),
       horrorMovies: await getHorrorMovies(),
+      scifiMovies: await getSciFiMovies(),
     });
     setIsLoading(false);
   };
@@ -82,13 +86,18 @@ const Home = () => {
           <TextInput
             placeholder="Search"
             placeholderTextColor="white"
+            cursorColor="#6ac045"
+            value={searchQuery}
+            onChangeText={(text) => setSearchQuery(text)}
             style={{
               color: "white",
               borderColor: "white",
               padding: 10,
               paddingHorizontal: 20,
+              paddingRight: 60,
               borderWidth: 1,
               borderRadius: 50,
+              fontSize: 16,
             }}
           />
           <Ionicons
@@ -102,6 +111,11 @@ const Home = () => {
               padding: 10,
               borderRadius: 50,
             }}
+            onPress={() => {
+              if (!searchQuery) Alert.alert("Please enter a search query");
+              else router.push(`/search/${searchQuery}`);
+              setSearchQuery("");
+            }}
           />
         </View>
         <ScrollView>
@@ -111,8 +125,8 @@ const Home = () => {
           />
           <MoviesList title="Horror Movies" movies={movies?.horrorMovies} />
           <MoviesList
-            title="Latest YIFI Movies"
-            movies={movies?.latestMovies}
+            title="Science Fiction Movies"
+            movies={movies?.scifiMovies}
           />
         </ScrollView>
       </SafeAreaView>

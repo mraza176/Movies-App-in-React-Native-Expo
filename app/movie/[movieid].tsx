@@ -107,7 +107,7 @@ const Movie = () => {
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
-                    marginLeft: 8,
+                    marginLeft: genre.length > 10 ? 0 : 8,
                   }}
                   key={genre}
                 >
@@ -128,7 +128,7 @@ const Movie = () => {
                   flexDirection: "row",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  width: 140,
+                  width: 134,
                   marginVertical: 15,
                 }}
               >
@@ -142,7 +142,7 @@ const Movie = () => {
                   flexDirection: "row",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  width: 138,
+                  width: 132,
                   marginLeft: 2,
                 }}
               >

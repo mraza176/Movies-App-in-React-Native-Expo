@@ -24,6 +24,18 @@ export const getHorrorMovies = async () => {
   }
 };
 
+export const getSciFiMovies = async () => {
+  try {
+    const response = await axios.get(
+      `${process.env.EXPO_PUBLIC_LATEST_MOVIES_URL}?limit=10&genre=sci-fi&sort_by=year`
+    );
+    return response.data.data.movies;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
+
 export const getMovie = async (movieId: string) => {
   try {
     const response = await axios.get(
@@ -45,5 +57,17 @@ export const getMovieSuggestions = async (movieId: string) => {
   } catch (error) {
     console.error(error);
     return {};
+  }
+};
+
+export const getSearchMovies = async (query: string) => {
+  try {
+    const response = await axios.get(
+      `${process.env.EXPO_PUBLIC_LATEST_MOVIES_URL}?query_term=${query}&sort_by=year`
+    );
+    return response.data.data.movies;
+  } catch (error) {
+    console.error(error);
+    return [];
   }
 };
