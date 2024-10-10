@@ -12,16 +12,31 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesome, Ionicons, Octicons } from "@expo/vector-icons";
-import { getMovie } from "@/api";
+import { getMovie, getMovieSuggestions } from "@/api";
+import MoviesList from "@/components/MoviesList";
 
 const Movie = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [movie, setMovie] = useState<any>({});
+  const [movie, setMovie] = useState<{
+    title?: string;
+    year?: number;
+    medium_cover_image?: string;
+    genres?: string[];
+    like_count?: number;
+    rating?: number;
+    cast?: [];
+    medium_screenshot_image1?: string;
+    medium_screenshot_image2?: string;
+    medium_screenshot_image3?: string;
+    description_full?: string;
+  }>({});
+  const [suggestions, setSuggestions] = useState<[]>([]);
   const { movieid } = useLocalSearchParams();
 
   const fetchData = async () => {
     setIsLoading(true);
     setMovie(await getMovie(movieid.toString()));
+    setSuggestions(await getMovieSuggestions(movieid.toString()));
     setIsLoading(false);
   };
 
@@ -180,6 +195,72 @@ const Movie = () => {
               />
             )}
           />
+          {movie.description_full && (
+            <>
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 28,
+                  fontWeight: "bold",
+                  marginTop: 30,
+                }}
+              >
+                Summary
+              </Text>
+              <Text
+                style={{ color: "grey", fontSize: 20, textAlign: "justify" }}
+              >
+                {movie.description_full}
+              </Text>
+            </>
+          )}
+          {movie.cast && (
+            <View style={{ marginTop: 30 }}>
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 28,
+                  fontWeight: "bold",
+                  marginVertical: 10,
+                }}
+              >
+                Cast
+              </Text>
+              {movie.cast?.map(
+                (actor: {
+                  name: string;
+                  character_name: string;
+                  url_small_image: string;
+                  imdb_code: string;
+                }) => (
+                  <View
+                    key={actor.imdb_code}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginTop: 10,
+                    }}
+                  >
+                    <Image
+                      source={{ uri: actor.url_small_image }}
+                      width={60}
+                      height={60}
+                      style={{ borderRadius: 50 }}
+                    />
+                    <Text
+                      style={{ color: "grey", fontSize: 20, marginLeft: 20 }}
+                    >
+                      {actor.name}
+                    </Text>
+                    <Text style={{ color: "white", fontSize: 20 }}>
+                      {` as ${actor.character_name}`}
+                    </Text>
+                  </View>
+                )
+              )}
+            </View>
+          )}
+          <MoviesList title="Similar Movies" movies={suggestions} />
         </ScrollView>
       </SafeAreaView>
     </>
