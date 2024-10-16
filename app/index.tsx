@@ -10,7 +10,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { getHorrorMovies, getLatestMovies, getSciFiMovies } from "@/api";
+import {
+  getActionMovies,
+  getHorrorMovies,
+  getLatestMovies,
+  getSciFiMovies,
+} from "@/api";
 import { StatusBar } from "expo-status-bar";
 import MoviesList from "@/components/MoviesList";
 import { router } from "expo-router";
@@ -20,13 +25,21 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [movies, setMovies] = useState<{
     latestMovies: [];
+    actionMovies: [];
     horrorMovies: [];
     scifiMovies: [];
-  }>({ latestMovies: [], horrorMovies: [], scifiMovies: [] });
+  }>({ latestMovies: [], actionMovies: [], horrorMovies: [], scifiMovies: [] });
+
+  const handleSearch = () => {
+    if (!searchQuery) Alert.alert("Please enter a search query");
+    else router.push(`/search/${searchQuery}`);
+    setSearchQuery("");
+  };
 
   const fetchData = async () => {
     setMovies({
       latestMovies: await getLatestMovies(),
+      actionMovies: await getActionMovies(),
       horrorMovies: await getHorrorMovies(),
       scifiMovies: await getSciFiMovies(),
     });
@@ -82,13 +95,14 @@ const Home = () => {
             height={50}
           />
         </View>
-        <View style={{ justifyContent: "center" }}>
+        <View style={{ justifyContent: "center", paddingBottom: 20 }}>
           <TextInput
             placeholder="Search"
             placeholderTextColor="white"
             cursorColor="#6ac045"
             value={searchQuery}
             onChangeText={(text) => setSearchQuery(text)}
+            onSubmitEditing={handleSearch}
             style={{
               color: "white",
               borderColor: "white",
@@ -107,15 +121,12 @@ const Home = () => {
             style={{
               position: "absolute",
               right: 3,
+              top: 3,
               backgroundColor: "#6ac045",
               padding: 10,
               borderRadius: 50,
             }}
-            onPress={() => {
-              if (!searchQuery) Alert.alert("Please enter a search query");
-              else router.push(`/search/${searchQuery}`);
-              setSearchQuery("");
-            }}
+            onPress={handleSearch}
           />
         </View>
         <ScrollView>
@@ -123,6 +134,7 @@ const Home = () => {
             title="Latest YIFI Movies"
             movies={movies?.latestMovies}
           />
+          <MoviesList title="Action Movies" movies={movies?.actionMovies} />
           <MoviesList title="Horror Movies" movies={movies?.horrorMovies} />
           <MoviesList
             title="Science Fiction Movies"

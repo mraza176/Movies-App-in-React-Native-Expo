@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -7,11 +7,13 @@ import {
   ScrollView,
   ActivityIndicator,
   FlatList,
+  Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesome, Ionicons, Octicons } from "@expo/vector-icons";
+import { BottomSheetView, BottomSheetModal } from "@gorhom/bottom-sheet";
 import { getMovie, getMovieSuggestions } from "@/api";
 import MoviesList from "@/components/MoviesList";
 
@@ -25,6 +27,7 @@ const Movie = () => {
     like_count?: number;
     rating?: number;
     cast?: [];
+    torrents?: [];
     medium_screenshot_image1?: string;
     medium_screenshot_image2?: string;
     medium_screenshot_image3?: string;
@@ -40,9 +43,15 @@ const Movie = () => {
     setIsLoading(false);
   };
 
+  const handleDownload = () => {
+    bottomSheetModalRef?.current?.present();
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   return isLoading ? (
     <View
@@ -160,6 +169,7 @@ const Movie = () => {
               backgroundColor: "#6ac045",
               borderRadius: 5,
             }}
+            onPress={() => handleDownload()}
           >
             <Text
               style={{ fontSize: 24, fontWeight: "bold", textAlign: "center" }}
@@ -262,6 +272,50 @@ const Movie = () => {
           )}
           <MoviesList title="Similar Movies" movies={suggestions} />
         </ScrollView>
+        <BottomSheetModal
+          ref={bottomSheetModalRef}
+          enablePanDownToClose={true}
+          handleStyle={{ backgroundColor: "black" }}
+          handleIndicatorStyle={{ backgroundColor: "white" }}
+        >
+          <BottomSheetView style={{ backgroundColor: "black" }}>
+            <Text
+              style={{
+                color: "white",
+                fontSize: 28,
+                fontWeight: "bold",
+                textAlign: "center",
+              }}
+            >
+              Download Torrent
+            </Text>
+            {movie.torrents?.map(
+              (torrent: { url: string; quality: string; size: string }) => (
+                <TouchableOpacity
+                  key={torrent.url}
+                  style={{
+                    padding: 10,
+                    backgroundColor: "#6ac045",
+                    borderRadius: 5,
+                    marginVertical: 10,
+                  }}
+                  onPress={() => Linking.openURL(torrent.url)}
+                >
+                  <Text
+                    style={{
+                      color: "black",
+                      fontSize: 24,
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    {`${torrent.quality}` + "  " + `${torrent.size}`}
+                  </Text>
+                </TouchableOpacity>
+              )
+            )}
+          </BottomSheetView>
+        </BottomSheetModal>
       </SafeAreaView>
     </>
   );

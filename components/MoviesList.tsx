@@ -5,7 +5,7 @@ const MoviesList = ({ title, movies }: { title: string; movies: [] }) => {
   return (
     <View
       style={{
-        marginTop: 30,
+        marginTop: title.includes("Latest") ? 10 : 30,
         marginBottom:
           title.includes("Science") || title.includes("Similar") ? 30 : 0,
       }}
